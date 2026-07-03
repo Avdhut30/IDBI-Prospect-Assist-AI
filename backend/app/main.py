@@ -1,17 +1,17 @@
 from fastapi import FastAPI
 
 app = FastAPI(
-    title="ProspectAssistAI API",
-    description="API for prospect scoring and sales assistance.",
-    version="0.1.0",
+    title="Prospect Assist AI",
+    version="1.0.0",
+    description="AI-powered Loan Prospect Identification System",
 )
 
 
 @app.get("/")
-async def root() -> dict[str, str]:
-    return {"message": "ProspectAssistAI API is running"}
+def root() -> dict[str, str]:
+    return {"message": "Welcome to Prospect Assist AI 🚀"}
 
 
 @app.get("/health")
-async def health_check() -> dict[str, str]:
-    return {"status": "healthy"}
+def health() -> dict[str, str]:
+    return {"status": "Healthy"}
