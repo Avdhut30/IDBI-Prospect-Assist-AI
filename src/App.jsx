@@ -1,13 +1,7 @@
-import Dashboard from "./pages/Dashboard";
-
-function App() {
-  return <Dashboard />;
-}
-
-export default App;
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import ProspectExplorer from "./pages/ProspectExplorer";
+import CustomerProfile from "./pages/CustomerProfile";
 
 function App() {
   return (
@@ -30,6 +24,10 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/prospects" element={<ProspectExplorer />} />
+            <Route
+              path="/customers/:customerId"
+              element={<CustomerProfile />}
+            />
           </Routes>
         </main>
       </div>
