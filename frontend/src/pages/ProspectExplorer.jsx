@@ -5,15 +5,21 @@ import API from "../api/api";
 export default function ProspectExplorer() {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     API.get("/top-prospects")
-      .then((res) => setCustomers(res.data))
+      .then((response) => setCustomers(response.data))
+      .catch(() => setError("Unable to load prospects."))
       .finally(() => setLoading(false));
   }, []);
 
   if (loading) {
     return <div className="p-6">Loading prospects...</div>;
+  }
+
+  if (error) {
+    return <div className="p-6 text-red-700">{error}</div>;
   }
 
   return (
@@ -42,7 +48,7 @@ export default function ProspectExplorer() {
                 <td className="p-4">{customer.customer_id}</td>
                 <td className="p-4">{customer.city}</td>
                 <td className="p-4">
-                  {Number(customer.monthly_income).toLocaleString("en-IN")}
+                  ₹{Number(customer.monthly_income).toLocaleString("en-IN")}
                 </td>
                 <td className="p-4">{customer.cibil_score}</td>
                 <td className="p-4">{customer.prospect_score}</td>
@@ -50,7 +56,7 @@ export default function ProspectExplorer() {
                 <td className="p-4">
                   <Link
                     to={`/customers/${customer.customer_id}`}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                   >
                     View
                   </Link>
