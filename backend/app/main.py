@@ -1,5 +1,7 @@
 from fastapi import FastAPI, HTTPException
 
+from app.ai.copilot import run_copilot
+from app.schemas.chat import ChatRequest
 from .schemas.customer import CustomerInput
 from .services.analytics import get_dashboard_summary
 from app.services.intelligence import calculate_prospect_intelligence
@@ -94,3 +96,8 @@ def customer_explanation(customer_id: str):
     recommendation = recommend_loan_product(customer, intelligence)
 
     return generate_customer_explanation(customer, intelligence, recommendation)
+
+
+@app.post("/ai/chat")
+def ai_chat(request: ChatRequest):
+    return run_copilot(request.question)
