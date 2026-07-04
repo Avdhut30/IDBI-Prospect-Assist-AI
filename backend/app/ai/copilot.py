@@ -1,4 +1,5 @@
 from app.ai.intent_router import detect_intent
+from app.ai.llm import polish_with_gemini
 from app.ai.prompt_builder import (
     build_customer_explanation_response,
     build_daily_priority_response,
@@ -48,7 +49,9 @@ def run_copilot(question: str):
             "'Show top Home Loan prospects'."
         )
 
+    final_answer = polish_with_gemini(answer)
+
     return {
         "intent": intent,
-        "answer": answer,
+        "answer": final_answer,
     }
