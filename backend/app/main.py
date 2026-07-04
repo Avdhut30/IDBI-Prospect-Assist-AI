@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 
 from .schemas.customer import CustomerInput
 from .services.analytics import get_dashboard_summary
+from app.services.intelligence import calculate_prospect_intelligence
 from .services.customer_data import (
     get_all_customers,
     get_customer_by_id,
@@ -18,7 +19,7 @@ app = FastAPI(
 
 @app.get("/")
 def root():
-    return {"message": "Welcome to Prospect Assist AI 🚀"}
+    return {"message": "Welcome to Prospect Assist AI"}
 
 
 @app.get("/health")
@@ -56,3 +57,13 @@ def customer_detail(customer_id: str):
 @app.get("/dashboard")
 def dashboard():
     return get_dashboard_summary()
+
+
+@app.get("/customers/{customer_id}/intelligence")
+def customer_intelligence(customer_id: str):
+    customer = get_customer_by_id(customer_id)
+
+    if customer is None:
+        raise HTTPException(status_code=404, detail="Customer not found")
+
+    return calculate_prospect_intelligence(customer)
