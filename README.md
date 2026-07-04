@@ -23,3 +23,15 @@ Prospect Assist AI analyzes customer financial behavior and predicts high-qualit
 ## Project Status
 
 Development started.
+
+## Run the backend
+
+From the repository root:
+
+```bash
+python -m uvicorn backend.app.main:app --reload
+```
+
+Backend modules use package-relative imports (for example,
+`from .services.scoring import predict_customer_score`). This keeps the import
+root consistent with `backend.app.main`.

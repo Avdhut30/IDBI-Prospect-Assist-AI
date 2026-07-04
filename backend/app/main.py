@@ -1,5 +1,7 @@
 from fastapi import FastAPI, HTTPException
+
 from .schemas.customer import CustomerInput
+from .services.analytics import get_dashboard_summary
 from .services.customer_data import (
     get_all_customers,
     get_customer_by_id,
@@ -49,3 +51,8 @@ def customer_detail(customer_id: str):
     prediction = predict_customer_score(customer)
 
     return {"customer": customer, "prediction": prediction}
+
+
+@app.get("/dashboard")
+def dashboard():
+    return get_dashboard_summary()
