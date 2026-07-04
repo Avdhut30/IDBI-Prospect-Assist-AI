@@ -3,6 +3,7 @@ from fastapi import FastAPI, HTTPException
 from .schemas.customer import CustomerInput
 from .services.analytics import get_dashboard_summary
 from app.services.intelligence import calculate_prospect_intelligence
+from app.services.recommendation import recommend_loan_product
 from .services.customer_data import (
     get_all_customers,
     get_customer_by_id,
@@ -67,3 +68,14 @@ def customer_intelligence(customer_id: str):
         raise HTTPException(status_code=404, detail="Customer not found")
 
     return calculate_prospect_intelligence(customer)
+
+
+@app.get("/customers/{customer_id}/recommendation")
+def customer_recommendation(customer_id: str):
+    customer = get_customer_by_id(customer_id)
+
+    if customer is None:
+        raise HTTPException(status_code=404, detail="Customer not found")
+
+    intelligence = calculate_prospect_intelligence(customer)
+    return recommend_loan_product(customer, intelligence)
