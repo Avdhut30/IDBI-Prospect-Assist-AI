@@ -1,5 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from .schemas.customer import CustomerInput
+from .services.customer_data import (
+    get_all_customers,
+    get_customer_by_id,
+    get_top_prospects,
+)
 from .services.scoring import predict_customer_score
 
 app = FastAPI(
@@ -21,5 +26,26 @@ def health():
 
 @app.post("/predict")
 def predict(customer: CustomerInput):
-    result = predict_customer_score(customer.model_dump())
-    return result
+    return predict_customer_score(customer.model_dump())
+
+
+@app.get("/customers")
+def customers(limit: int = 100):
+    return get_all_customers(limit)
+
+
+@app.get("/top-prospects")
+def top_prospects(limit: int = 50):
+    return get_top_prospects(limit)
+
+
+@app.get("/customers/{customer_id}")
+def customer_detail(customer_id: str):
+    customer = get_customer_by_id(customer_id)
+
+    if customer is None:
+        raise HTTPException(status_code=404, detail="Customer not found")
+
+    prediction = predict_customer_score(customer)
+
+    return {"customer": customer, "prediction": prediction}
