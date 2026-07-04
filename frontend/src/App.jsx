@@ -1,4 +1,5 @@
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
+import AICopilot from "./pages/AICopilot";
 import CustomerProfile from "./pages/CustomerProfile";
 import Dashboard from "./pages/Dashboard";
 import ProspectExplorer from "./pages/ProspectExplorer";
@@ -17,6 +18,9 @@ function App() {
             <Link className="block hover:text-blue-300" to="/prospects">
               Prospect Explorer
             </Link>
+            <Link className="block hover:text-blue-300" to="/ai-copilot">
+              AI Copilot
+            </Link>
           </nav>
         </aside>
 
@@ -24,6 +28,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/prospects" element={<ProspectExplorer />} />
+            <Route path="/ai-copilot" element={<AICopilot />} />
             <Route
               path="/customers/:customerId"
               element={<CustomerProfile />}
