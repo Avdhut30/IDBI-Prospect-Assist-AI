@@ -6,12 +6,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 GEMINI_CONFIGURED = bool(GEMINI_API_KEY and GEMINI_API_KEY != "your_api_key_here")
 
 if GEMINI_CONFIGURED:
     genai.configure(api_key=GEMINI_API_KEY)
 
-model = genai.GenerativeModel("gemini-1.5-flash")
+model = genai.GenerativeModel(GEMINI_MODEL)
 
 
 def polish_with_gemini(context: str):

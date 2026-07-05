@@ -4,6 +4,7 @@ from app.ai.copilot import run_copilot
 from app.schemas.chat import ChatRequest
 from .schemas.customer import CustomerInput
 from .services.analytics import get_dashboard_summary
+from app.services.executive_brief import generate_executive_brief
 from app.services.intelligence import calculate_prospect_intelligence
 
 from app.services.recommendation import recommend_loan_product
@@ -62,6 +63,11 @@ def customer_detail(customer_id: str):
 @app.get("/dashboard")
 def dashboard():
     return get_dashboard_summary()
+
+
+@app.get("/executive-brief")
+def executive_brief():
+    return generate_executive_brief()
 
 
 @app.get("/customers/{customer_id}/intelligence")
