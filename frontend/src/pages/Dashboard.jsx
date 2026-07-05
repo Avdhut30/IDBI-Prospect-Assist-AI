@@ -15,9 +15,11 @@ import {
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
+  const [brief, setBrief] = useState(null);
 
   useEffect(() => {
     API.get("/dashboard").then((res) => setData(res.data));
+    API.get("/executive-brief").then((res) => setBrief(res.data));
   }, []);
 
   if (!data) return <div className="p-6">Loading dashboard...</div>;
@@ -41,6 +43,20 @@ export default function Dashboard() {
     <div className="min-h-screen bg-slate-100 p-6">
       <h1 className="text-3xl font-bold mb-2">Prospect Assist AI</h1>
       <p className="text-slate-600 mb-6">AI Relationship Manager Copilot</p>
+
+      {brief && (
+        <div className="bg-gradient-to-r from-slate-900 to-blue-900 text-white rounded-3xl p-6 shadow mb-6">
+          <h2 className="text-2xl font-bold mb-2">{brief.greeting} 👋</h2>
+          <p className="text-blue-100 mb-4">{brief.brief}</p>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+            <BriefCard title="High Priority" value={brief.high_priority_prospects} />
+            <BriefCard title="Opportunity" value={`₹${brief.estimated_business_opportunity_cr} Cr`} />
+            <BriefCard title="Top City" value={brief.top_city} />
+            <BriefCard title="Top Product" value={brief.top_product} />
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <Card title="Total Customers" value={data.total_customers} icon={<Users />} />
@@ -120,6 +136,15 @@ function ChartCard({ title, children }) {
     <div className="bg-white rounded-2xl shadow p-6">
       <h2 className="text-xl font-bold mb-4">{title}</h2>
       {children}
+    </div>
+  );
+}
+
+function BriefCard({ title, value }) {
+  return (
+    <div className="bg-white/10 rounded-2xl p-4">
+      <p className="text-blue-200 text-sm">{title}</p>
+      <h3 className="text-2xl font-bold mt-1">{value}</h3>
     </div>
   );
 }
