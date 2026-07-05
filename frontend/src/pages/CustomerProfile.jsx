@@ -65,6 +65,15 @@ export default function CustomerProfile() {
             <h3 className="text-5xl font-bold mt-2">{score}</h3>
             <p className="mt-2">{intel.prospect_category}</p>
           </div>
+
+          <a
+            href={`http://127.0.0.1:8000/customers/${customer.customer_id}/report`}
+            target="_blank"
+            rel="noreferrer"
+            className="bg-white text-blue-900 px-5 py-3 rounded-xl font-semibold hover:bg-blue-50"
+          >
+            Export PDF Report
+          </a>
         </div>
       </div>
 
