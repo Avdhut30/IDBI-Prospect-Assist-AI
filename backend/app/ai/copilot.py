@@ -1,12 +1,12 @@
-from app.ai.intent_router import detect_intent
-from app.ai.llm import polish_with_gemini
-from app.ai.prompt_builder import (
+from .intent_router import detect_intent
+from .llm import polish_with_gemini
+from .prompt_builder import (
     build_customer_explanation_response,
     build_daily_priority_response,
     build_dashboard_summary_response,
     build_prospect_list_response,
 )
-from app.ai.tools import (
+from .tools import (
     customer_explanation_tool,
     daily_priority_tool,
     dashboard_summary_tool,

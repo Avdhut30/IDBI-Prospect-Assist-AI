@@ -1,16 +1,17 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
 
-from app.ai.copilot import run_copilot
-from app.schemas.chat import ChatRequest
-from app.schemas.what_if import WhatIfRequest
+from .ai.copilot import run_copilot
+from .schemas.chat import ChatRequest
+from .schemas.what_if import WhatIfRequest
 from .schemas.customer import CustomerInput
 from .services.analytics import get_dashboard_summary
-from app.services.executive_brief import generate_executive_brief
-from app.services.intelligence import calculate_prospect_intelligence
-from app.services.what_if import run_what_if_analysis
+from .services.executive_brief import generate_executive_brief
+from .services.intelligence import calculate_prospect_intelligence
+from .services.upload_service import save_uploaded_customers
+from .services.what_if import run_what_if_analysis
 
-from app.services.recommendation import recommend_loan_product
-from app.services.explanation import generate_customer_explanation
+from .services.recommendation import recommend_loan_product
+from .services.explanation import generate_customer_explanation
 from .services.customer_data import (
     get_all_customers,
     get_customer_by_id,
@@ -79,6 +80,11 @@ def what_if(request: WhatIfRequest):
         request.income_change,
         request.emi_change
     )
+
+
+@app.post("/upload-customers")
+def upload_customers(file: UploadFile = File(...)):
+    return save_uploaded_customers(file)
 
 
 @app.get("/customers/{customer_id}/intelligence")

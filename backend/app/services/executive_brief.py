@@ -1,5 +1,5 @@
-from app.services.customer_data import load_customers
-from app.services.analytics import get_dashboard_summary
+from .customer_data import load_customers
+from .analytics import get_dashboard_summary
 
 
 def generate_executive_brief():

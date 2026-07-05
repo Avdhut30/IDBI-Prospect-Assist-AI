@@ -1,6 +1,6 @@
-from app.services.customer_data import get_customer_by_id
-from app.services.intelligence import calculate_prospect_intelligence
-from app.services.recommendation import recommend_loan_product
+from .customer_data import get_customer_by_id
+from .intelligence import calculate_prospect_intelligence
+from .recommendation import recommend_loan_product
 
 
 def run_what_if_analysis(customer_id: str, income_change: float = 0, emi_change: float = 0):

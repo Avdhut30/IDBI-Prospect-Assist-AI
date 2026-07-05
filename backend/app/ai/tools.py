@@ -1,10 +1,10 @@
 import re
 
-from app.services.analytics import get_dashboard_summary
-from app.services.customer_data import get_customer_by_id, get_top_prospects
-from app.services.explanation import generate_customer_explanation
-from app.services.intelligence import calculate_prospect_intelligence
-from app.services.recommendation import recommend_loan_product
+from ..services.analytics import get_dashboard_summary
+from ..services.customer_data import get_customer_by_id, get_top_prospects
+from ..services.explanation import generate_customer_explanation
+from ..services.intelligence import calculate_prospect_intelligence
+from ..services.recommendation import recommend_loan_product
 
 
 def extract_customer_id(question: str):
