@@ -10,6 +10,14 @@ import {
   Briefcase,
   IndianRupee,
 } from "lucide-react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 export default function CustomerProfile() {
   const { customerId } = useParams();
@@ -18,15 +26,36 @@ export default function CustomerProfile() {
   const [intel, setIntel] = useState(null);
   const [rec, setRec] = useState(null);
   const [explain, setExplain] = useState(null);
+  const [timeline, setTimeline] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    API.get(`/customers/${customerId}`).then((res) => setProfile(res.data));
-    API.get(`/customers/${customerId}/intelligence`).then((res) => setIntel(res.data));
-    API.get(`/customers/${customerId}/recommendation`).then((res) => setRec(res.data));
-    API.get(`/customers/${customerId}/explanation`).then((res) => setExplain(res.data));
+    setError(null);
+
+    Promise.all([
+      API.get(`/customers/${customerId}`),
+      API.get(`/customers/${customerId}/intelligence`),
+      API.get(`/customers/${customerId}/recommendation`),
+      API.get(`/customers/${customerId}/explanation`),
+      API.get(`/customers/${customerId}/timeline`),
+    ])
+      .then(([profileRes, intelRes, recRes, explainRes, timelineRes]) => {
+        setProfile(profileRes.data);
+        setIntel(intelRes.data);
+        setRec(recRes.data);
+        setExplain(explainRes.data);
+        setTimeline(timelineRes.data.timeline);
+      })
+      .catch(() => {
+        setError("Unable to load customer intelligence. Please try again.");
+      });
   }, [customerId]);
 
-  if (!profile || !intel || !rec || !explain) {
+  if (error) {
+    return <div className="p-6 text-red-700">{error}</div>;
+  }
+
+  if (!profile || !intel || !rec || !explain || !timeline) {
     return <div className="p-6">Loading customer intelligence...</div>;
   }
 
@@ -126,6 +155,22 @@ export default function CustomerProfile() {
             />
           ))}
         </div>
+      </section>
+
+      <section className="bg-white rounded-3xl shadow p-6 mt-6">
+        <h2 className="text-2xl font-bold mb-5">Financial Timeline</h2>
+
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={timeline}>
+            <XAxis dataKey="month" />
+            <YAxis />
+            <Tooltip />
+            <Line type="monotone" dataKey="income" strokeWidth={3} />
+            <Line type="monotone" dataKey="balance" strokeWidth={3} />
+            <Line type="monotone" dataKey="savings" strokeWidth={3} />
+            <Line type="monotone" dataKey="emi" strokeWidth={3} />
+          </LineChart>
+        </ResponsiveContainer>
       </section>
 
       <section className="bg-white rounded-3xl shadow p-6 mt-6">
