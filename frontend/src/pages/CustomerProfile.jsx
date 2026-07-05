@@ -3,9 +3,6 @@ import { useParams } from "react-router-dom";
 import API from "../api/api";
 import {
   ShieldCheck,
-  AlertTriangle,
-  BadgeCheck,
-  User,
   MapPin,
   Briefcase,
   IndianRupee,
@@ -30,8 +27,6 @@ export default function CustomerProfile() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    setError(null);
-
     Promise.all([
       API.get(`/customers/${customerId}`),
       API.get(`/customers/${customerId}/intelligence`),
@@ -40,6 +35,7 @@ export default function CustomerProfile() {
       API.get(`/customers/${customerId}/timeline`),
     ])
       .then(([profileRes, intelRes, recRes, explainRes, timelineRes]) => {
+        setError(null);
         setProfile(profileRes.data);
         setIntel(intelRes.data);
         setRec(recRes.data);

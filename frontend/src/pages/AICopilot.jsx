@@ -32,7 +32,7 @@ export default function AICopilot() {
           intent: res.data.intent,
         },
       ]);
-    } catch (error) {
+    } catch {
       setMessages((prev) => [
         ...prev,
         { role: "ai", text: "Something went wrong. Please check backend." },

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, MapPin, Banknote, Star } from "lucide-react";
+import { Search, MapPin, Star } from "lucide-react";
 import API from "../api/api";
 
 export default function ProspectExplorer() {
