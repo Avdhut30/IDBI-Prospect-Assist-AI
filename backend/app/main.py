@@ -14,6 +14,7 @@ from .services.what_if import run_what_if_analysis
 from .services.recommendation import recommend_loan_product
 from .services.explanation import generate_customer_explanation
 from .services.report_service import generate_customer_pdf
+from .services.timeline_service import generate_customer_timeline
 from .services.customer_data import (
     get_all_customers,
     get_customer_by_id,
@@ -135,6 +136,16 @@ def customer_report(customer_id: str):
         filename=f"{customer_id}_report.pdf",
         media_type="application/pdf"
     )
+
+
+@app.get("/customers/{customer_id}/timeline")
+def customer_timeline(customer_id: str):
+    timeline = generate_customer_timeline(customer_id)
+
+    if timeline is None:
+        raise HTTPException(status_code=404, detail="Customer not found")
+
+    return timeline
 
 
 @app.post("/ai/chat")
