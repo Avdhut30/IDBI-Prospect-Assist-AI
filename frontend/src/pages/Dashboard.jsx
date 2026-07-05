@@ -3,6 +3,7 @@ import API from "../api/api";
 import MetricCard from "../components/common/MetricCard";
 import ChartCard from "../components/common/ChartCard";
 import PageHeader from "../components/common/PageHeader";
+import AIInsights from "../components/dashboard/AIInsights";
 import {
   Users,
   Target,
@@ -160,26 +161,7 @@ export default function Dashboard() {
           </ResponsiveContainer>
         </ChartCard>
 
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">
-            Relationship Manager Focus
-          </h2>
-
-          <div className="space-y-4">
-            <Task
-              title={`Prioritize ${brief.immediate_followups} immediate follow-ups`}
-              desc="Low FOIR and strong CIBIL customers should be contacted first."
-            />
-            <Task
-              title={`Focus on ${brief.top_product}`}
-              desc={`Current portfolio signals show strongest product demand for ${brief.top_product}.`}
-            />
-            <Task
-              title={`Target ${brief.top_city}`}
-              desc={`${brief.top_city} has the highest concentration of high-quality prospects.`}
-            />
-          </div>
-        </div>
+        <AIInsights brief={brief} />
       </section>
     </div>
   );
@@ -190,15 +172,6 @@ function BriefCard({ title, value }) {
     <div className="bg-white/10 rounded-2xl p-4">
       <p className="text-blue-200 text-sm">{title}</p>
       <h3 className="text-2xl font-bold mt-1">{value}</h3>
-    </div>
-  );
-}
-
-function Task({ title, desc }) {
-  return (
-    <div className="border border-slate-100 rounded-2xl p-4 bg-slate-50">
-      <h3 className="font-bold text-slate-900">{title}</h3>
-      <p className="text-slate-600 text-sm mt-1">{desc}</p>
     </div>
   );
 }
