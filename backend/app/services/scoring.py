@@ -2,7 +2,7 @@ import joblib
 import pandas as pd
 from pathlib import Path
 
-MODEL_DIR = Path(__file__).resolve().parents[3] / "models"
+MODEL_DIR = Path(__file__).resolve().parents[2] / "models"
 
 lead_model = joblib.load(MODEL_DIR / "lead_model.pkl")
 income_model = joblib.load(MODEL_DIR / "income_model.pkl")

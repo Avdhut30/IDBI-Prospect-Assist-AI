@@ -10,6 +10,7 @@ venv/
 # ML files
 *.pkl
 *.joblib
+!backend/models/*.pkl
 
 # Node
 node_modules/
