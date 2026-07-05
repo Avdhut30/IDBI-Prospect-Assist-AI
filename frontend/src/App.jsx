@@ -3,6 +3,7 @@ import AICopilot from "./pages/AICopilot";
 import CustomerProfile from "./pages/CustomerProfile";
 import Dashboard from "./pages/Dashboard";
 import ProspectExplorer from "./pages/ProspectExplorer";
+import WhatIfAnalysis from "./pages/WhatIfAnalysis";
 
 function App() {
   return (
@@ -21,6 +22,9 @@ function App() {
             <Link className="block hover:text-blue-300" to="/ai-copilot">
               AI Copilot
             </Link>
+            <Link className="block hover:text-blue-300" to="/what-if">
+              What-if Analysis
+            </Link>
           </nav>
         </aside>
 
@@ -29,6 +33,7 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/prospects" element={<ProspectExplorer />} />
             <Route path="/ai-copilot" element={<AICopilot />} />
+            <Route path="/what-if" element={<WhatIfAnalysis />} />
             <Route
               path="/customers/:customerId"
               element={<CustomerProfile />}
