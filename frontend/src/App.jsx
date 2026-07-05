@@ -14,6 +14,7 @@ import CustomerProfile from "./pages/CustomerProfile";
 import AICopilot from "./pages/AICopilot";
 import WhatIfAnalysis from "./pages/WhatIfAnalysis";
 import UploadCustomers from "./pages/UploadCustomers";
+import TopBar from "./components/layout/TopBar";
 
 function App() {
   return (
@@ -45,6 +46,8 @@ function App() {
         </aside>
 
         <main className="flex-1 overflow-y-auto">
+          <TopBar />
+
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/prospects" element={<ProspectExplorer />} />
