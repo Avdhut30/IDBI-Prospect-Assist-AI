@@ -26,11 +26,21 @@ Development started.
 
 ## Run the backend
 
-From the repository root:
+From the repository root in Git Bash:
 
 ```bash
-python -m uvicorn backend.app.main:app --reload
+./backend/venv/Scripts/python.exe -m uvicorn backend.app.main:app --reload --reload-dir backend/app
 ```
+
+In PowerShell:
+
+```powershell
+.\backend\venv\Scripts\python.exe -m uvicorn backend.app.main:app --reload --reload-dir backend/app
+```
+
+Using the backend virtual environment ensures installed dependencies such as
+ReportLab are available. Restricting reloads to `backend/app` prevents changes
+inside `backend/venv` from triggering unnecessary server restarts.
 
 Backend modules use package-relative imports (for example,
 `from .services.scoring import predict_customer_score`). This keeps the import

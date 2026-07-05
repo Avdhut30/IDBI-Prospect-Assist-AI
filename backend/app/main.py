@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi.responses import FileResponse
 
 from .ai.copilot import run_copilot
 from .schemas.chat import ChatRequest
@@ -12,6 +13,7 @@ from .services.what_if import run_what_if_analysis
 
 from .services.recommendation import recommend_loan_product
 from .services.explanation import generate_customer_explanation
+from .services.report_service import generate_customer_pdf
 from .services.customer_data import (
     get_all_customers,
     get_customer_by_id,
@@ -119,6 +121,20 @@ def customer_explanation(customer_id: str):
     recommendation = recommend_loan_product(customer, intelligence)
 
     return generate_customer_explanation(customer, intelligence, recommendation)
+
+
+@app.get("/customers/{customer_id}/report")
+def customer_report(customer_id: str):
+    file_path = generate_customer_pdf(customer_id)
+
+    if file_path is None:
+        raise HTTPException(status_code=404, detail="Customer not found")
+
+    return FileResponse(
+        path=file_path,
+        filename=f"{customer_id}_report.pdf",
+        media_type="application/pdf"
+    )
 
 
 @app.post("/ai/chat")
