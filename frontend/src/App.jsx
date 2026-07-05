@@ -3,6 +3,7 @@ import AICopilot from "./pages/AICopilot";
 import CustomerProfile from "./pages/CustomerProfile";
 import Dashboard from "./pages/Dashboard";
 import ProspectExplorer from "./pages/ProspectExplorer";
+import UploadCustomers from "./pages/UploadCustomers";
 import WhatIfAnalysis from "./pages/WhatIfAnalysis";
 
 function App() {
@@ -25,6 +26,9 @@ function App() {
             <Link className="block hover:text-blue-300" to="/what-if">
               What-if Analysis
             </Link>
+            <Link className="block hover:text-blue-300" to="/upload">
+              CSV Upload
+            </Link>
           </nav>
         </aside>
 
@@ -34,6 +38,7 @@ function App() {
             <Route path="/prospects" element={<ProspectExplorer />} />
             <Route path="/ai-copilot" element={<AICopilot />} />
             <Route path="/what-if" element={<WhatIfAnalysis />} />
+            <Route path="/upload" element={<UploadCustomers />} />
             <Route
               path="/customers/:customerId"
               element={<CustomerProfile />}
