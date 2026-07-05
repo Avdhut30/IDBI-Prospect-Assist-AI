@@ -1,6 +1,15 @@
 import { useEffect, useState } from "react";
 import API from "../api/api";
-import { Users, Target, AlertTriangle, IndianRupee } from "lucide-react";
+import MetricCard from "../components/common/MetricCard";
+import ChartCard from "../components/common/ChartCard";
+import PageHeader from "../components/common/PageHeader";
+import {
+  Users,
+  Target,
+  AlertTriangle,
+  IndianRupee,
+  Sparkles,
+} from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -22,7 +31,9 @@ export default function Dashboard() {
     API.get("/executive-brief").then((res) => setBrief(res.data));
   }, []);
 
-  if (!data) return <div className="p-6">Loading dashboard...</div>;
+  if (!data || !brief) {
+    return <div className="p-6">Loading enterprise dashboard...</div>;
+  }
 
   const loanData = Object.entries(data.loan_distribution).map(([name, value]) => ({
     name,
@@ -41,46 +52,91 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-slate-100 p-6">
-      <h1 className="text-3xl font-bold mb-2">Prospect Assist AI</h1>
-      <p className="text-slate-600 mb-6">AI Relationship Manager Copilot</p>
+      <PageHeader
+        title="Executive Dashboard"
+        subtitle="AI-powered overview of customer lending opportunities."
+      />
 
-      {brief && (
-        <div className="bg-gradient-to-r from-slate-900 to-blue-900 text-white rounded-3xl p-6 shadow mb-6">
-          <h2 className="text-2xl font-bold mb-2">{brief.greeting} 👋</h2>
-          <p className="text-blue-100 mb-4">{brief.brief}</p>
+      <section className="bg-gradient-to-r from-slate-950 to-blue-950 text-white rounded-3xl p-8 shadow mb-6">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <div>
+            <div className="flex items-center gap-2 text-blue-200 mb-3">
+              <Sparkles size={20} />
+              <span>AI Executive Brief</span>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
-            <BriefCard title="High Priority" value={brief.high_priority_prospects} />
-            <BriefCard title="Opportunity" value={`₹${brief.estimated_business_opportunity_cr} Cr`} />
-            <BriefCard title="Top City" value={brief.top_city} />
-            <BriefCard title="Top Product" value={brief.top_product} />
+            <h2 className="text-3xl font-bold mb-3">{brief.greeting} 👋</h2>
+            <p className="text-blue-100 max-w-3xl leading-relaxed">
+              {brief.brief}
+            </p>
+          </div>
+
+          <div className="bg-white/10 rounded-3xl p-6 min-w-[230px]">
+            <p className="text-blue-200 text-sm">Business Opportunity</p>
+            <h3 className="text-4xl font-bold mt-2">
+              ₹{brief.estimated_business_opportunity_cr} Cr
+            </h3>
+            <p className="text-blue-200 mt-2">Projected portfolio opportunity</p>
           </div>
         </div>
-      )}
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <Card title="Total Customers" value={data.total_customers} icon={<Users />} />
-        <Card title="Total Prospects" value={data.total_prospects} icon={<Target />} />
-        <Card title="High Risk Customers" value={data.high_risk_customers} icon={<AlertTriangle />} />
-        <Card title="Avg Income" value={`₹${data.average_income}`} icon={<IndianRupee />} />
-      </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
+          <BriefCard title="High Priority" value={brief.high_priority_prospects} />
+          <BriefCard title="Top City" value={brief.top_city} />
+          <BriefCard title="Top Product" value={brief.top_product} />
+          <BriefCard title="Immediate Follow-ups" value={brief.immediate_followups} />
+        </div>
+      </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartCard title="Loan Distribution">
-          <ResponsiveContainer width="100%" height={280}>
+      <section className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-6">
+        <MetricCard
+          title="Total Customers"
+          value={data.total_customers}
+          icon={<Users />}
+          trend="8.2%"
+        />
+        <MetricCard
+          title="High Potential Prospects"
+          value={data.total_prospects}
+          icon={<Target />}
+          trend="12.4%"
+        />
+        <MetricCard
+          title="High Risk Customers"
+          value={data.high_risk_customers}
+          icon={<AlertTriangle />}
+          trend="3.1%"
+        />
+        <MetricCard
+          title="Average Income"
+          value={`₹${data.average_income}`}
+          icon={<IndianRupee />}
+          trend="5.7%"
+        />
+      </section>
+
+      <section className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <ChartCard
+          title="Loan Product Distribution"
+          subtitle="Distribution of recommended loan products."
+        >
+          <ResponsiveContainer width="100%" height={300}>
             <BarChart data={loanData}>
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="value" />
+              <Bar dataKey="value" radius={[8, 8, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Risk Distribution">
-          <ResponsiveContainer width="100%" height={280}>
+        <ChartCard
+          title="Risk Distribution"
+          subtitle="Portfolio risk segmentation across all customers."
+        >
+          <ResponsiveContainer width="100%" height={300}>
             <PieChart>
-              <Pie data={riskData} dataKey="value" nameKey="name" outerRadius={100} label>
+              <Pie data={riskData} dataKey="value" nameKey="name" outerRadius={105} label>
                 {riskData.map((_, index) => (
                   <Cell key={index} />
                 ))}
@@ -90,52 +146,41 @@ export default function Dashboard() {
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="City-wise Prospect Opportunities">
-          <ResponsiveContainer width="100%" height={300}>
+        <ChartCard
+          title="City-wise Opportunity"
+          subtitle="High potential prospects grouped by city."
+        >
+          <ResponsiveContainer width="100%" height={320}>
             <BarChart data={cityData}>
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="prospects" />
+              <Bar dataKey="prospects" radius={[8, 8, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
 
-        <div className="bg-white rounded-2xl shadow p-6">
-          <h2 className="text-xl font-bold mb-4">AI Executive Insight</h2>
-          <p className="text-slate-700 leading-relaxed">
-            Based on the current customer portfolio, the system has identified{" "}
-            <b>{data.total_prospects}</b> high-potential loan prospects with an
-            estimated conversion potential of{" "}
-            <b>{data.conversion_potential_percent}%</b>. Relationship managers
-            should prioritize low-risk customers with stable salary patterns,
-            strong CIBIL scores, and clear loan intent signals.
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
+          <h2 className="text-xl font-bold text-slate-900 mb-4">
+            Relationship Manager Focus
+          </h2>
 
-function Card({ title, value, icon }) {
-  return (
-    <div className="bg-white rounded-2xl shadow p-5">
-      <div className="flex justify-between items-center">
-        <div>
-          <p className="text-slate-500 text-sm">{title}</p>
-          <h2 className="text-2xl font-bold mt-2">{value}</h2>
+          <div className="space-y-4">
+            <Task
+              title={`Prioritize ${brief.immediate_followups} immediate follow-ups`}
+              desc="Low FOIR and strong CIBIL customers should be contacted first."
+            />
+            <Task
+              title={`Focus on ${brief.top_product}`}
+              desc={`Current portfolio signals show strongest product demand for ${brief.top_product}.`}
+            />
+            <Task
+              title={`Target ${brief.top_city}`}
+              desc={`${brief.top_city} has the highest concentration of high-quality prospects.`}
+            />
+          </div>
         </div>
-        <div className="text-blue-600">{icon}</div>
-      </div>
-    </div>
-  );
-}
-
-function ChartCard({ title, children }) {
-  return (
-    <div className="bg-white rounded-2xl shadow p-6">
-      <h2 className="text-xl font-bold mb-4">{title}</h2>
-      {children}
+      </section>
     </div>
   );
 }
@@ -145,6 +190,15 @@ function BriefCard({ title, value }) {
     <div className="bg-white/10 rounded-2xl p-4">
       <p className="text-blue-200 text-sm">{title}</p>
       <h3 className="text-2xl font-bold mt-1">{value}</h3>
+    </div>
+  );
+}
+
+function Task({ title, desc }) {
+  return (
+    <div className="border border-slate-100 rounded-2xl p-4 bg-slate-50">
+      <h3 className="font-bold text-slate-900">{title}</h3>
+      <p className="text-slate-600 text-sm mt-1">{desc}</p>
     </div>
   );
 }
