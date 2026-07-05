@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
 from .ai.copilot import run_copilot
@@ -26,6 +27,14 @@ app = FastAPI(
     title="Prospect Assist AI",
     version="1.0.0",
     description="AI-powered Loan Prospect Identification System",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
