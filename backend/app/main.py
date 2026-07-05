@@ -2,10 +2,12 @@ from fastapi import FastAPI, HTTPException
 
 from app.ai.copilot import run_copilot
 from app.schemas.chat import ChatRequest
+from app.schemas.what_if import WhatIfRequest
 from .schemas.customer import CustomerInput
 from .services.analytics import get_dashboard_summary
 from app.services.executive_brief import generate_executive_brief
 from app.services.intelligence import calculate_prospect_intelligence
+from app.services.what_if import run_what_if_analysis
 
 from app.services.recommendation import recommend_loan_product
 from app.services.explanation import generate_customer_explanation
@@ -68,6 +70,15 @@ def dashboard():
 @app.get("/executive-brief")
 def executive_brief():
     return generate_executive_brief()
+
+
+@app.post("/what-if")
+def what_if(request: WhatIfRequest):
+    return run_what_if_analysis(
+        request.customer_id,
+        request.income_change,
+        request.emi_change
+    )
 
 
 @app.get("/customers/{customer_id}/intelligence")
