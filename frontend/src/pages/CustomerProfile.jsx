@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import API from "../api/api";
+import StatusBadge from "../components/common/StatusBadge";
+import CrossSellCard from "../components/customer/CrossSellCard";
 import {
   ShieldCheck,
   MapPin,
   Briefcase,
   IndianRupee,
+  UserRound,
+  FileDown,
+  Activity,
 } from "lucide-react";
 import {
   LineChart,
@@ -69,9 +74,17 @@ export default function CustomerProfile() {
 
       <div className="bg-gradient-to-r from-slate-900 to-blue-900 text-white rounded-3xl p-7 shadow mb-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div>
-            <p className="text-blue-200 mb-2">Customer ID</p>
-            <h2 className="text-4xl font-bold">{customer.customer_id}</h2>
+          <div className="md:flex-1">
+            <div className="flex items-center gap-4">
+              <div className="rounded-2xl bg-white/10 p-4 ring-1 ring-white/15">
+                <UserRound size={38} />
+              </div>
+              <div>
+                <p className="text-blue-200 mb-1">Customer ID</p>
+                <h2 className="text-4xl font-bold">{customer.customer_id}</h2>
+              </div>
+            </div>
+
             <div className="flex flex-wrap gap-4 mt-4 text-blue-100">
               <span className="flex items-center gap-2">
                 <MapPin size={18} /> {customer.city}
@@ -85,27 +98,49 @@ export default function CustomerProfile() {
             </div>
           </div>
 
-          <div className="bg-white/10 rounded-2xl p-5 text-center min-w-[180px]">
-            <p className="text-blue-200">Prospect Score</p>
-            <h3 className="text-5xl font-bold mt-2">{score}</h3>
-            <p className="mt-2">{intel.prospect_category}</p>
-          </div>
+          <div className="flex flex-col sm:flex-row items-stretch gap-4">
+            <div className="bg-white/10 rounded-2xl p-5 text-center min-w-[180px]">
+              <p className="text-blue-200">Prospect Score</p>
+              <h3 className="text-5xl font-bold mt-2">{score}</h3>
+              <p className="mt-2">{intel.prospect_category}</p>
+            </div>
 
-          <a
-            href={`http://127.0.0.1:8000/customers/${customer.customer_id}/report`}
-            target="_blank"
-            rel="noreferrer"
-            className="bg-white text-blue-900 px-5 py-3 rounded-xl font-semibold hover:bg-blue-50"
-          >
-            Export PDF Report
-          </a>
+            <div className="flex flex-col justify-center gap-3">
+              <a
+                href={`http://127.0.0.1:8000/customers/${customer.customer_id}/report`}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-center gap-2 bg-white text-blue-900 px-5 py-3 rounded-xl font-semibold hover:bg-blue-50 transition"
+              >
+                <FileDown size={18} />
+                Export PDF Report
+              </a>
+
+              <Link
+                to="/what-if"
+                className="flex items-center justify-center gap-2 border border-white/30 bg-white/10 px-5 py-3 rounded-xl font-semibold hover:bg-white/20 transition"
+              >
+                <Activity size={18} />
+                Run What-if
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <TopCard title="Recommended Product" value={rec.recommended_product} />
-        <TopCard title="Priority" value={rec.priority} />
-        <TopCard title="Risk Level" value={intel.risk_level} />
+        <TopCard
+          title="Recommended Product"
+          value={<StatusBadge type="product" value={rec.recommended_product} />}
+        />
+        <TopCard
+          title="Priority"
+          value={<StatusBadge type="priority" value={rec.priority} />}
+        />
+        <TopCard
+          title="Risk Level"
+          value={<StatusBadge type="risk" value={intel.risk_level} />}
+        />
         <TopCard title="CIBIL Score" value={customer.cibil_score} />
       </div>
 
@@ -168,6 +203,8 @@ export default function CustomerProfile() {
           </LineChart>
         </ResponsiveContainer>
       </section>
+
+      <CrossSellCard customer={customer} />
 
       <section className="bg-white rounded-3xl shadow p-6 mt-6">
         <h2 className="text-2xl font-bold mb-5">Why This Customer?</h2>
