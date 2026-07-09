@@ -87,11 +87,14 @@ def executive_brief():
 
 @app.post("/what-if")
 def what_if(request: WhatIfRequest):
-    return run_what_if_analysis(
-        request.customer_id,
-        request.income_change,
-        request.emi_change
+    result = run_what_if_analysis(
+        request.customer_id, request.income_change, request.emi_change
     )
+
+    if result.get("error"):
+        raise HTTPException(status_code=404, detail=result["error"])
+
+    return result
 
 
 @app.post("/upload-customers")
@@ -143,7 +146,7 @@ def customer_report(customer_id: str):
     return FileResponse(
         path=file_path,
         filename=f"{customer_id}_report.pdf",
-        media_type="application/pdf"
+        media_type="application/pdf",
     )
 
 

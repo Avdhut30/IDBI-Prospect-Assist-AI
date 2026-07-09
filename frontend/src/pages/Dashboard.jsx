@@ -3,6 +3,7 @@ import API from "../api/api";
 import MetricCard from "../components/common/MetricCard";
 import ChartCard from "../components/common/ChartCard";
 import PageHeader from "../components/common/PageHeader";
+import StateMessage from "../components/common/StateMessage";
 import AIInsights from "../components/dashboard/AIInsights";
 import {
   Users,
@@ -22,18 +23,40 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { formatCurrency, formatPercent } from "../utils/formatters";
+
+const RISK_COLORS = ["#16a34a", "#f59e0b", "#dc2626"];
+const BAR_COLOR = "#2563eb";
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
   const [brief, setBrief] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    API.get("/dashboard").then((res) => setData(res.data));
-    API.get("/executive-brief").then((res) => setBrief(res.data));
+    Promise.all([API.get("/dashboard"), API.get("/executive-brief")])
+      .then(([dashboardRes, briefRes]) => {
+        setData(dashboardRes.data);
+        setBrief(briefRes.data);
+        setError(null);
+      })
+      .catch(() => {
+        setError("Unable to load dashboard insights. Please check backend.");
+      });
   }, []);
 
+  if (error) {
+    return <StateMessage type="error" title="Dashboard unavailable" message={error} />;
+  }
+
   if (!data || !brief) {
-    return <div className="p-6">Loading enterprise dashboard...</div>;
+    return (
+      <StateMessage
+        type="loading"
+        title="Loading enterprise dashboard"
+        message="Preparing portfolio KPIs, charts, and executive brief."
+      />
+    );
   }
 
   const loanData = Object.entries(data.loan_distribution).map(([name, value]) => ({
@@ -58,30 +81,35 @@ export default function Dashboard() {
         subtitle="AI-powered overview of customer lending opportunities."
       />
 
-      <section className="bg-gradient-to-r from-slate-950 to-blue-950 text-white rounded-3xl p-8 shadow mb-6">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+      <section className="mb-6 overflow-hidden rounded-3xl bg-gradient-to-r from-slate-950 via-blue-950 to-indigo-950 p-8 text-white shadow-xl shadow-blue-950/10">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <div className="flex items-center gap-2 text-blue-200 mb-3">
+            <div className="mb-3 flex items-center gap-2 text-blue-200">
               <Sparkles size={20} />
               <span>AI Executive Brief</span>
             </div>
 
-            <h2 className="text-3xl font-bold mb-3">{brief.greeting} 👋</h2>
-            <p className="text-blue-100 max-w-3xl leading-relaxed">
+            <h2 className="mb-3 text-3xl font-bold">{brief.greeting} 👋</h2>
+            <p className="max-w-3xl leading-relaxed text-blue-100">
               {brief.brief}
             </p>
+            {brief.generated_time && (
+              <p className="mt-4 text-sm text-blue-200">
+                Generated at {brief.generated_time}
+              </p>
+            )}
           </div>
 
-          <div className="bg-white/10 rounded-3xl p-6 min-w-[230px]">
-            <p className="text-blue-200 text-sm">Business Opportunity</p>
-            <h3 className="text-4xl font-bold mt-2">
+          <div className="min-w-[250px] rounded-3xl border border-white/10 bg-white/10 p-6 backdrop-blur">
+            <p className="text-sm text-blue-200">Business Opportunity</p>
+            <h3 className="mt-2 text-4xl font-bold">
               ₹{brief.estimated_business_opportunity_cr} Cr
             </h3>
-            <p className="text-blue-200 mt-2">Projected portfolio opportunity</p>
+            <p className="mt-2 text-blue-200">Projected portfolio opportunity</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
+        <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-4">
           <BriefCard title="High Priority" value={brief.high_priority_prospects} />
           <BriefCard title="Top City" value={brief.top_city} />
           <BriefCard title="Top Product" value={brief.top_product} />
@@ -89,7 +117,7 @@ export default function Dashboard() {
         </div>
       </section>
 
-      <section className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-6">
+      <section className="mb-6 grid grid-cols-1 gap-5 md:grid-cols-4">
         <MetricCard
           title="Total Customers"
           value={data.total_customers}
@@ -100,33 +128,33 @@ export default function Dashboard() {
           title="High Potential Prospects"
           value={data.total_prospects}
           icon={<Target />}
-          trend="12.4%"
+          trend={formatPercent(12.4)}
         />
         <MetricCard
           title="High Risk Customers"
           value={data.high_risk_customers}
           icon={<AlertTriangle />}
-          trend="3.1%"
+          trend={formatPercent(3.1)}
         />
         <MetricCard
           title="Average Income"
-          value={`₹${data.average_income}`}
+          value={formatCurrency(data.average_income)}
           icon={<IndianRupee />}
-          trend="5.7%"
+          trend={formatPercent(5.7)}
         />
       </section>
 
-      <section className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      <section className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <ChartCard
           title="Loan Product Distribution"
           subtitle="Distribution of recommended loan products."
         >
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={loanData}>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="value" radius={[8, 8, 0, 0]} />
+              <XAxis dataKey="name" tickLine={false} axisLine={false} />
+              <YAxis tickLine={false} axisLine={false} />
+              <Tooltip cursor={{ fill: "#eff6ff" }} />
+              <Bar dataKey="value" fill={BAR_COLOR} radius={[8, 8, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -137,9 +165,15 @@ export default function Dashboard() {
         >
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
-              <Pie data={riskData} dataKey="value" nameKey="name" outerRadius={105} label>
+              <Pie
+                data={riskData}
+                dataKey="value"
+                nameKey="name"
+                outerRadius={105}
+                label
+              >
                 {riskData.map((_, index) => (
-                  <Cell key={index} />
+                  <Cell key={index} fill={RISK_COLORS[index % RISK_COLORS.length]} />
                 ))}
               </Pie>
               <Tooltip />
@@ -153,10 +187,10 @@ export default function Dashboard() {
         >
           <ResponsiveContainer width="100%" height={320}>
             <BarChart data={cityData}>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="prospects" radius={[8, 8, 0, 0]} />
+              <XAxis dataKey="name" tickLine={false} axisLine={false} />
+              <YAxis tickLine={false} axisLine={false} />
+              <Tooltip cursor={{ fill: "#eff6ff" }} />
+              <Bar dataKey="prospects" fill={BAR_COLOR} radius={[8, 8, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -169,9 +203,9 @@ export default function Dashboard() {
 
 function BriefCard({ title, value }) {
   return (
-    <div className="bg-white/10 rounded-2xl p-4">
-      <p className="text-blue-200 text-sm">{title}</p>
-      <h3 className="text-2xl font-bold mt-1">{value}</h3>
+    <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur">
+      <p className="text-sm text-blue-200">{title}</p>
+      <h3 className="mt-1 text-2xl font-bold">{value}</h3>
     </div>
   );
 }

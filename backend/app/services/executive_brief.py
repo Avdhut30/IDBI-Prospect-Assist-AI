@@ -1,41 +1,63 @@
+import os
+from datetime import datetime
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+
 from .customer_data import load_customers
 from .analytics import get_dashboard_summary
 
 
+def _current_datetime():
+    timezone_name = os.getenv("APP_TIMEZONE", "Asia/Kolkata")
+
+    try:
+        return datetime.now(ZoneInfo(timezone_name))
+    except ZoneInfoNotFoundError:
+        return datetime.now()
+
+
+def _greeting_for_time(now):
+    if 5 <= now.hour < 12:
+        return "Good Morning"
+    if 12 <= now.hour < 17:
+        return "Good Afternoon"
+    return "Good Evening"
+
+
 def generate_executive_brief():
+    now = _current_datetime()
     df = load_customers()
     summary = get_dashboard_summary()
 
-    high_priority = df[
-        (df["loan_accepted"] == 1) &
-        (df["prospect_score"] >= 75)
-    ]
+    high_priority = df[(df["loan_accepted"] == 1) & (df["prospect_score"] >= 75)]
 
     top_city = (
         high_priority["city"].value_counts().idxmax()
-        if not high_priority.empty else "N/A"
+        if not high_priority.empty
+        else "N/A"
     )
 
     top_product = (
         high_priority["recommended_loan"].value_counts().idxmax()
-        if not high_priority.empty else "N/A"
+        if not high_priority.empty
+        else "N/A"
     )
 
     estimated_business_value = int(
-        (
-            high_priority["monthly_income"].sum() * 12 * 0.6
-        ) / 10000000
+        (high_priority["monthly_income"].sum() * 12 * 0.6) / 10000000
     )
 
     immediate_followups = int(
-        len(high_priority[
-            (high_priority["cibil_score"] >= 720) &
-            (high_priority["foir"] < 0.35)
-        ])
+        len(
+            high_priority[
+                (high_priority["cibil_score"] >= 720) & (high_priority["foir"] < 0.35)
+            ]
+        )
     )
 
     brief = {
-        "greeting": "Good Morning, Relationship Manager",
+        "greeting": f"{_greeting_for_time(now)}, Relationship Manager",
+        "generated_at": now.isoformat(),
+        "generated_time": now.strftime("%I:%M %p"),
         "total_customers": summary["total_customers"],
         "high_priority_prospects": int(len(high_priority)),
         "estimated_business_opportunity_cr": estimated_business_value,
@@ -49,7 +71,7 @@ def generate_executive_brief():
             f"with {top_product} showing the highest product demand. "
             f"Relationship managers should prioritize {immediate_followups} "
             f"customers with strong CIBIL scores and low FOIR."
-        )
+        ),
     }
 
     return brief

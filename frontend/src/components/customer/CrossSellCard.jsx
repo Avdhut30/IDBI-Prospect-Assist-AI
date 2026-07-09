@@ -39,19 +39,25 @@ export default function CrossSellCard({ customer }) {
     <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 mt-6">
       <h2 className="text-2xl font-bold mb-5">Cross-sell Opportunities</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {opportunities.map((item, index) => (
-          <div key={index} className="bg-slate-50 rounded-2xl p-4 flex gap-3">
-            <div className="bg-blue-100 text-blue-700 p-3 rounded-xl">
-              {item.icon}
+      {opportunities.length === 0 ? (
+        <div className="rounded-2xl border border-slate-100 bg-slate-50 p-5 text-slate-600">
+          No strong cross-sell signals detected yet for this customer.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {opportunities.map((item, index) => (
+            <div key={index} className="bg-slate-50 rounded-2xl p-4 flex gap-3">
+              <div className="bg-blue-100 text-blue-700 p-3 rounded-xl">
+                {item.icon}
+              </div>
+              <div>
+                <h3 className="font-bold">{item.title}</h3>
+                <p className="text-sm text-slate-500">{item.reason}</p>
+              </div>
             </div>
-            <div>
-              <h3 className="font-bold">{item.title}</h3>
-              <p className="text-sm text-slate-500">{item.reason}</p>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

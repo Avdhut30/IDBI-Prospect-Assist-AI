@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import API from "../api/api";
 import { Bot, Send, Copy, Trash2 } from "lucide-react";
 import PageHeader from "../components/common/PageHeader";
@@ -7,16 +7,41 @@ export default function AICopilot() {
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [sampleCustomerId, setSampleCustomerId] = useState("CUST10001");
+  const messagesEndRef = useRef(null);
 
-  const suggestions = [
-    "Who should I contact today?",
-    "Explain customer CUST00001",
-    "Show top Home Loan prospects",
-    "Give dashboard summary",
-  ];
+  useEffect(() => {
+    API.get("/customers?limit=1")
+      .then((res) => {
+        const firstCustomer = res.data?.[0];
+
+        if (firstCustomer?.customer_id) {
+          setSampleCustomerId(firstCustomer.customer_id);
+        }
+      })
+      .catch(() => {
+        setSampleCustomerId("CUST10001");
+      });
+  }, []);
+
+  const suggestions = useMemo(
+    () => [
+      "Who should I contact today?",
+      `Explain customer ${sampleCustomerId}`,
+      `What is the CIBIL score of ${sampleCustomerId}?`,
+      "Show top 5 Home Loan prospects",
+      "How many high-risk customers are there?",
+      "Average income by city",
+    ],
+    [sampleCustomerId]
+  );
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, loading]);
 
   async function askCopilot(q = question) {
-    if (!q.trim()) return;
+    if (!q.trim() || loading) return;
 
     const userMessage = {
       role: "user",
@@ -55,17 +80,17 @@ export default function AICopilot() {
   }
 
   function copyText(text) {
-    navigator.clipboard.writeText(text);
+    navigator.clipboard?.writeText(text);
   }
 
   return (
     <div className="min-h-screen bg-slate-100 p-6">
       <PageHeader
         title="AI Relationship Manager Copilot"
-        subtitle="Ask questions about prospects, recommendations, and customer intelligence."
+        subtitle="Ask natural-language questions about any customer or metric in the active dataset."
       />
 
-      <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 max-w-6xl">
+      <div className="max-w-6xl rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="bg-blue-600 text-white p-3 rounded-2xl">
@@ -74,7 +99,7 @@ export default function AICopilot() {
             <div>
               <h2 className="text-xl font-bold">Prospect Assist AI</h2>
               <p className="text-slate-500 text-sm">
-                Banking decision-support assistant powered by Gemini
+                Data-aware banking assistant powered by your active customer CSV
               </p>
             </div>
           </div>
@@ -102,8 +127,9 @@ export default function AICopilot() {
 
         <div className="h-[470px] overflow-y-auto bg-slate-50 rounded-3xl p-5 mb-5 space-y-5">
           {messages.length === 0 && (
-            <div className="text-slate-500 text-center mt-36">
-              Ask me who to contact, why a customer is recommended, or which loan prospects to prioritize.
+            <div className="mt-36 text-center text-slate-500">
+              Ask me about any customer, city, loan product, risk segment, score,
+              income, FOIR, or portfolio summary.
             </div>
           )}
 
@@ -149,6 +175,8 @@ export default function AICopilot() {
               Prospect Assist AI is analyzing banking data...
             </div>
           )}
+
+          <div ref={messagesEndRef} />
         </div>
 
         <div className="flex gap-3">
@@ -156,13 +184,14 @@ export default function AICopilot() {
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && askCopilot()}
-            placeholder="Ask: Explain customer CUST00001..."
+            placeholder={`Ask: Compare ${sampleCustomerId} with another customer...`}
             className="flex-1 border border-slate-200 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-blue-500"
           />
 
           <button
             onClick={() => askCopilot()}
-            className="bg-blue-600 text-white px-6 rounded-2xl hover:bg-blue-700 flex items-center gap-2"
+            disabled={loading || !question.trim()}
+            className="flex items-center gap-2 rounded-2xl bg-blue-600 px-6 text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Send size={18} />
             Ask
