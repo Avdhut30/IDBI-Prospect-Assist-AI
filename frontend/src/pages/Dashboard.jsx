@@ -15,6 +15,8 @@ import {
 import {
   BarChart,
   Bar,
+  CartesianGrid,
+  LabelList,
   PieChart,
   Pie,
   Cell,
@@ -73,6 +75,8 @@ export default function Dashboard() {
     name,
     prospects: value,
   }));
+
+  const cityChartHeight = Math.max(360, cityData.length * 42);
 
   return (
     <div className="min-h-screen bg-slate-100 p-6">
@@ -185,12 +189,39 @@ export default function Dashboard() {
           title="City-wise Opportunity"
           subtitle="High potential prospects grouped by city."
         >
-          <ResponsiveContainer width="100%" height={320}>
-            <BarChart data={cityData}>
-              <XAxis dataKey="name" tickLine={false} axisLine={false} />
-              <YAxis tickLine={false} axisLine={false} />
+          <ResponsiveContainer width="100%" height={cityChartHeight}>
+            <BarChart
+              data={cityData}
+              layout="vertical"
+              margin={{ top: 4, right: 48, bottom: 4, left: 8 }}
+              barCategoryGap="24%"
+            >
+              <CartesianGrid horizontal={false} stroke="#e2e8f0" strokeDasharray="3 3" />
+              <XAxis
+                type="number"
+                tickLine={false}
+                axisLine={false}
+                tick={{ fill: "#64748b", fontSize: 12 }}
+              />
+              <YAxis
+                type="category"
+                dataKey="name"
+                interval={0}
+                width={92}
+                tickLine={false}
+                axisLine={false}
+                tick={{ fill: "#334155", fontSize: 13, fontWeight: 600 }}
+              />
               <Tooltip cursor={{ fill: "#eff6ff" }} />
-              <Bar dataKey="prospects" fill={BAR_COLOR} radius={[8, 8, 0, 0]} />
+              <Bar dataKey="prospects" fill={BAR_COLOR} radius={[0, 8, 8, 0]}>
+                <LabelList
+                  dataKey="prospects"
+                  position="right"
+                  fill="#475569"
+                  fontSize={12}
+                  fontWeight={600}
+                />
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
